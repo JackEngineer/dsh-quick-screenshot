@@ -1,5 +1,7 @@
 # dsh-quick-screenshot
 
+English | [中文](README.zh.md)
+
 One-click screenshots of the DeepSeek Harness window, placed straight into the
 composer draft.
 

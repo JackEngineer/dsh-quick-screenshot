@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "Quick Screenshot",
+    "description": "One-click screenshot button in the composer tool row: it captures the DeepSeek Harness window (or the whole desktop with a modifier) and drops the PNG straight into the composer draft as an attachment."
+  }
+}
