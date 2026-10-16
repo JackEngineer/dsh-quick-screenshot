@@ -9,9 +9,13 @@
 > **当前状态（2026-10-16 21:15 +08:00）**
 >
 > 仓库已创建并推送：<https://github.com/JackEngineer/dsh-quick-screenshot>（public，已加 `dsh-plugin` topic）。
-> 仓库 `createdAt` = `2026-10-16T13:15:04Z`，列表要求「创建满 1 天」，
+> 仓库 `createdAt` = `2026-10-16T13:15:04Z`，列表要求「创建满 1 天」（CI 里 `MIN_AGE_DAYS = 1`），
 > 因此**最早可提收录 PR 的时间是 2026-10-17 21:15（+08:00）**。
-> 本地已全部改到位，剩下的只有下面的第 4 步（提 PR）。
+> 投稿所需的其余部分已全部备好：已 fork `awesome-dsh-plugin/awesome-dsh-plugin` 到
+> `JackEngineer/awesome-dsh-plugin`，分支 `add-dsh-quick-screenshot` 已从 upstream `main`
+> 建好并放上 `data/plugins/JackEngineer__dsh-quick-screenshot.yml`（已完成 YAML 与列表
+> `scripts/lib/entries.mjs` 的字段/文件名/slug 校验），PR 正文在 [market/PR-body.md](market/PR-body.md)。
+> **剩下的只有到点执行下面第 4 步的那一条 `gh pr create`。**
 
 ## 已经为你改好的部分
 
@@ -88,6 +92,21 @@ npm publish --access public        # 名称 dsh-quick-screenshot 已核实可用
 data/plugins/JackEngineer__dsh-quick-screenshot.yml
 ```
 
+**这一步已经替你做好**（fork、分支、文件都就位），到点只需要开 PR：
+
+```sh
+gh pr create --repo awesome-dsh-plugin/awesome-dsh-plugin \
+  --head JackEngineer:add-dsh-quick-screenshot \
+  --title "Add dsh-quick-screenshot" \
+  --body-file market/PR-body.md
+```
+
+开 PR 前若 upstream 的 `main` 已经前进，先同步 fork（GitHub 只做快进，不会动这个分支）：
+
+```sh
+gh api -X POST repos/JackEngineer/awesome-dsh-plugin/merge-upstream -f branch=main
+```
+
 内容就是仓库里已经写好的那份（[market/JackEngineer__dsh-quick-screenshot.yml](market/JackEngineer__dsh-quick-screenshot.yml)）：
 
 ```yaml
@@ -95,21 +114,13 @@ url: https://github.com/JackEngineer/dsh-quick-screenshot
 name: JackEngineer/dsh-quick-screenshot
 category: ui
 description:
-  en: One-click screenshot button in the composer tool row that captures the DeepSeek Harness window (or the whole desktop with a modifier) using the host's own capture tooling and drops the PNG straight into the composer draft as an attachment. Windows-verified, with macOS and Linux backends; no dependencies and no build step.
-  zh: 输入框工具行里的一键截图按钮：用宿主侧工具截取 DeepSeek Harness 窗口（按住修饰键可截整个桌面），PNG 直接作为附件落进输入框草稿。Windows 实测，另带 macOS/Linux 后端；零依赖、无构建步骤。
+  en: 'One-click screenshot button in the composer tool row that captures the DeepSeek Harness window (or the whole desktop with a modifier) using the host capture tooling and drops the PNG straight into the composer draft as an attachment. Windows-verified, with macOS and Linux backends; no dependencies and no build step.'
+  zh: '输入框工具行里的一键截图按钮：用宿主侧工具截取 DeepSeek Harness 窗口（按住修饰键可截整个桌面），PNG 直接作为附件落进输入框草稿。Windows 实测，另带 macOS/Linux 后端；零依赖、无构建步骤。'
 ```
 
-```sh
-gh repo fork awesome-dsh-plugin/awesome-dsh-plugin --clone
-cd awesome-dsh-plugin
-mkdir -p data/plugins
-cp /path/to/market/JackEngineer__dsh-quick-screenshot.yml data/plugins/
-git checkout -b add-dsh-quick-screenshot
-git add data/plugins/JackEngineer__dsh-quick-screenshot.yml
-git commit -m "Add dsh-quick-screenshot"
-git push -u origin add-dsh-quick-screenshot
-gh pr create --repo awesome-dsh-plugin/awesome-dsh-plugin --fill
-```
+字段与文件名已对齐列表的 `scripts/lib/entries.mjs`：文件名必须等于 URL 的 slug
+（`owner__repo`）、`name` 必须是 `owner/repo`、`category` 必须取自固定集合、只允许
+`url`/`name`/`category`/`description`/`tarball` 这几个键。
 
 注意：
 
