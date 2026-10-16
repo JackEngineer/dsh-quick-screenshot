@@ -1,0 +1,30 @@
+name: Test
+
+# The Host suite's real captures need a desktop session with the DSH window on
+# screen, so this workflow skips them (DSH_SCREENSHOT_SKIP_CAPTURE=1) and runs
+# everything else: the route contract, the failure mapping, staging pruning and
+# the whole Client suite. Run `npm test` on a desktop checkout for the captures.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Host half — route contract without a desktop
+        run: node scripts/selftest.mjs
+        env:
+          DSH_SCREENSHOT_SKIP_CAPTURE: '1'
+      - name: Client half — bundle, control and attach flow
+        run: node scripts/client-smoke.mjs

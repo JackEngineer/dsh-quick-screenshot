@@ -126,8 +126,13 @@ node scripts/client-smoke.mjs    # the Client bundle, control and attach flow
 objects: capabilities, method rejection, a **real** window capture through
 PowerShell (PNG signature, IHDR size, metadata header, content length), a real
 capped screen capture, the failure mapping for a missing capture shell, and
-staging-directory pruning. It is best run where a desktop session exists —
-without one the real captures are reported as skipped.
+staging-directory pruning. Real captures run where a desktop session and a
+capture backend exist; elsewhere they are reported as skipped, or skipped on
+purpose with `DSH_SCREENSHOT_SKIP_CAPTURE=1`.
+
+`.github/workflows/test.yml` runs both suites on every push and pull request with
+that flag set, so the repository keeps a green check on a machine that has no
+desktop.
 
 `scripts/client-smoke.mjs` evaluates the bundle against a stub module loader, a
 small React stub that runs effects, and fake composer services: it asserts what
