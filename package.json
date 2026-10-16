@@ -12,6 +12,7 @@
   "bugs": {
     "url": "https://github.com/JackEngineer/dsh-quick-screenshot/issues"
   },
+  "icon": "icon.svg",
   "type": "module",
   "main": "lib/index.js",
   "exports": {
