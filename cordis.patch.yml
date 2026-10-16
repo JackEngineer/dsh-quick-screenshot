@@ -1,0 +1,8 @@
+# Quick Screenshot bundle: one row, which is this same package. Its Host half
+# captures the DeepSeek Harness window (or the whole desktop) from the Host
+# machine and serves the PNG over one authenticated exact Fetch route,
+# /api/quick-screenshot; its Client half puts one camera control in the composer
+# tool row and drops the captured image into the composer draft.
+- insert:
+    - id: screenshot
+      name: 'dsh-quick-screenshot'
