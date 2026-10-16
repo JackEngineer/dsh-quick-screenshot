@@ -23,4 +23,4 @@
 
 - `node scripts/selftest.mjs` — real captures through the route (PNG signature, IHDR size, metadata header, content length), the failure mapping for a missing capture shell, and staging-directory pruning
 - `node scripts/client-smoke.mjs` — bundle registration, the admit path, a locked composer, a Host refusal, the paste fallback, and the shared `Ctrl+Shift+S` chord
-- Live on DeepSeek Harness 0.2.0-rc.2 (desktop): `POST /api/quick-screenshot` returns a real 1282×821 PNG and the composer control registers as an active occupant of `conversation.input.left`
+- Live on DeepSeek Harness 0.2.0-rc.2 (desktop): `POST /api/quick-screenshot` returns a real PNG, the composer control registers as an active occupant of `conversation.input.left`, and one click on it puts the captured image into the draft as an attachment — verified in the running app, not only in the suites (`docs/composer-attached.png` is that result)
