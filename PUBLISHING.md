@@ -6,6 +6,13 @@
 **一个插件一个 YAML 文件**。所以「发到市场」= 给自己的仓库提一个收录 PR，站点和市场通常一天内生效。
 官方投稿指南：[contributing.md](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/blob/main/contributing.md)。
 
+> **当前状态（2026-10-16 21:15 +08:00）**
+>
+> 仓库已创建并推送：<https://github.com/JackEngineer/dsh-quick-screenshot>（public，已加 `dsh-plugin` topic）。
+> 仓库 `createdAt` = `2026-10-16T13:15:04Z`，列表要求「创建满 1 天」，
+> 因此**最早可提收录 PR 的时间是 2026-10-17 21:15（+08:00）**。
+> 本地已全部改到位，剩下的只有下面的第 4 步（提 PR）。
+
 ## 已经为你改好的部分
 
 | 项 | 状态 |
@@ -131,5 +138,5 @@ dsh plugin --profile web add github:JackEngineer/dsh-quick-screenshot
 - [x] `repository` 指回 `https://github.com/JackEngineer/dsh-quick-screenshot`
 - [x] npm 包名 `dsh-quick-screenshot` 未被占用
 - [x] 条目 YAML 已按列表格式写好（`market/` 目录）
-- [ ] 仓库已创建、已加 `dsh-plugin` topic（第 1 步）
-- [ ] 仓库创建满 1 天后再提 PR（第 4 步）
+- [x] 仓库已创建、已加 `dsh-plugin` topic（第 1 步，2026-10-16 21:15 +08:00）
+- [ ] 仓库创建满 1 天后提 PR（第 4 步，最早 2026-10-17 21:15 +08:00）
