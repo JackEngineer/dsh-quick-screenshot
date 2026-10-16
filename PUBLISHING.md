@@ -17,6 +17,22 @@
 > `scripts/lib/entries.mjs` 的字段/文件名/slug 校验），PR 正文在 [market/PR-body.md](market/PR-body.md)。
 > **剩下的只有到点执行下面第 4 步的那一条 `gh pr create`。**
 
+### 已经用列表自己的检查脚本预跑过（2026-10-16）
+
+把上游的 `scripts/check-submission.mjs` 与其依赖 `scripts/lib/entries.mjs` 原样拉到
+`%TEMP%\dsh-gate` 跑了一遍（`--base` 用 upstream `main` 的 `44310b7`）：
+
+- `validateEntries(readEntries('data/plugins'))` → `problems: []`：**条目本身零问题**
+  （文件名 = URL 的 slug、`name` = `owner/repo`、`category` 属于固定集合、只含允许键、`description.en` 有值）；
+- `check-submission.mjs` → 唯一失败项就是仓库年龄，脚本自己给的结论是
+  `repository is 0.0 days old (needs 1) — the age bar is the only thing failing here`
+  （即 `dsh.bundle`、仓库存在、未被归档、非 DSH 本身这几项都已通过）；
+- 另外确认了 `pr-check.yml` 的形态要求：本 PR 是 **+1/-0 个条目文件、且不改生成的 README**，
+  正是它明确支持的提交形态（stale-fork guard 只在删除 >2 条时失败；README 一步在未改动时
+  会自动重新生成再放行）；
+- 上游 `data/plugins/JackEngineer__dsh-quick-screenshot.yml` 目前不存在（404），目录快照里也没有
+  `JackEngineer` 条目 —— 没有重名或重复收录的冲突。
+
 ## 已经为你改好的部分
 
 | 项 | 状态 |
