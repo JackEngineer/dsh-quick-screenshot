@@ -17,6 +17,7 @@
  *   node scripts/selftest.mjs
  */
 
+import { existsSync } from 'node:fs';
 import { mkdir, readdir, rm, utimes, writeFile } from 'node:fs/promises';
 import { basename, join } from 'node:path';
 
@@ -153,6 +154,8 @@ if (canCapture) {
 			must('metadata reports a window title', typeof meta.window === 'string' && meta.window.length > 0, JSON.stringify(meta.window));
 			must('metadata byte count matches the body', meta.bytes === bytes.byteLength, `${String(meta.bytes)} vs ${String(bytes.byteLength)}`);
 			must('metadata names a capture method', typeof meta.method === 'string' && meta.method.length > 0, meta.method);
+			must('metadata names the staged file', typeof meta.path === 'string' && meta.path.endsWith('.png'), String(meta.path));
+			must('the staged file exists on disk', typeof meta.path === 'string' && existsSync(meta.path), String(meta.path));
 			const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
 			must(
 				'the PNG IHDR size matches the metadata',

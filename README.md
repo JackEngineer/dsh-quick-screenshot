@@ -14,27 +14,31 @@ the package's `./client` bundle.
 
 | Seat | Result |
 | --- | --- |
-| `conversation.input.left` | A **camera control** in the composer's left tool row, next to `+` |
+| `shell.overlay` | A **floating camera control** over the whole window, so a screenshot works on every page — not only where a composer happens to be mounted. Drag it anywhere; the anchor persists in `localStorage`. |
+| `conversation.input.left` | The same control in the composer's left tool row, next to `+` |
 
 | Gesture | Capture target |
 | --- | --- |
 | Click | The DeepSeek Harness window (largest visible window whose title contains `DeepSeek Harness`, falling back to the foreground window) |
 | Shift+click | The whole desktop, every monitor |
 | Alt+click | Whatever window is currently in the foreground |
-| `Ctrl+Shift+S` | The same as a plain click, for the composer that currently holds the keyboard focus |
+| `Ctrl+Shift+S` | The same as a plain click, from anywhere on the page |
 
-Every gesture ends in the same place: the PNG becomes a draft attachment in the
-composer, so the next message carries the image. A click never steals the
-keyboard — `mousedown` is prevented, so the caret stays where it was.
+Where the image lands depends on what is on screen: a mounted composer's draft
+takes it as an attachment, so the next message carries the image; with no
+composer mounted the PNG goes to the clipboard, ready to paste into the
+conversation the reader navigates to. A click never steals the keyboard —
+`mousedown` is prevented, so the caret stays where it was.
 
 The control reports what happened in place: a spinner while the Host captures,
 `已放入输入框` with the captured pixel size for a few seconds afterwards, or the
 Host's own refusal text when the capture failed. The tooltip carries the full
 gesture list and the last result.
 
-## How the image reaches the composer
+## Where the image goes
 
-The Client half follows the path the composer's own paste and drop intake take:
+With a composer mounted, the Client half follows the path the composer's own
+paste and drop intake take:
 
 1. `POST /api/quick-screenshot` returns the PNG bytes (and a small metadata header).
 2. `ctx.conversation.createDrafts(sessionId, [file])` registers the browser file
@@ -42,6 +46,11 @@ The Client half follows the path the composer's own paste and drop intake take:
 3. The `inputActions` standard prop admits those ids with
    `addAttachments(ids)` — the composer's rail then shows the thumbnail and the
    send serializes the image with the message.
+
+With no composer mounted (the plugins page, Trajectory, Settings …) the same
+capture is written to the system clipboard instead, and the result bubble says
+so — paste it into a composer when the reader gets there. If the clipboard
+refuses the write, the bubble names the staged PNG on disk instead.
 
 When those services are unavailable, the client falls back to dispatching a
 synthetic `paste` event carrying the file on `[data-composer-input="true"]`,
@@ -65,7 +74,7 @@ takes an optional JSON body and answers with the PNG:
 
 The response is `image/png` with `Cache-Control: no-store` and one
 `X-Screenshot` header carrying percent-encoded JSON metadata
-(`mode`, `method`, `window`, `width`, `height`, `bytes`). Failures answer JSON
+(`mode`, `method`, `window`, `width`, `height`, `bytes`, `path`). Failures answer JSON
 with a stable `code` (`CAPTURE_UNSUPPORTED`, `CAPTURE_TIMEOUT`, `CAPTURE_FAILED`,
 `METHOD_NOT_ALLOWED`) and a message meant for the user. Both methods are
 registered through `ctx.connection.fetch`, so the shared `/api` bridge applies
@@ -138,9 +147,12 @@ desktop.
 
 `scripts/client-smoke.mjs` evaluates the bundle against a stub module loader, a
 small React stub that runs effects, and fake composer services: it asserts what
-`apply` registers, then drives `captureInto` through the admit path, a locked
-composer, a Host refusal, an empty image, and the paste fallback, and finally
-mounts the control and fires the shared `Ctrl+Shift+S` chord.
+`apply` registers (both seats), then drives the shared delivery path through the
+admit path, a locked composer, a Host refusal, an empty image, and the paste
+fallback, plus the no-composer clipboard path and a refused clipboard. Finally it
+mounts both controls: the composer button captures on click and keeps focus, the
+floating control drags past its threshold (persisting the anchor) and suppresses
+the click that ended a drag, and the shared `Ctrl+Shift+S` chord fires it.
 
 ## Known limitations
 

@@ -1,6 +1,6 @@
 {
   "meta": {
     "title": "快速截图",
-    "description": "输入框工具行里的一键截图按钮：截取 DeepSeek Harness 窗口（按住修饰键可截整个桌面），PNG 直接作为附件落进输入框草稿。"
+    "description": "悬浮在任意 DSH 页面上的一键截图按钮（输入框工具行里另有一个）：截取 DeepSeek Harness 窗口，把 PNG 放进输入框草稿；没有输入框时放进剪贴板。"
   }
 }

@@ -10,26 +10,31 @@
 
 | 位置 | 结果 |
 | --- | --- |
-| `conversation.input.left` | 输入框左侧工具行里的一个**相机控件**，就在 `+` 旁边 |
+| `shell.overlay` | **浮在整个窗口上的**相机控件，因此在任意页面都能截图——不再局限于挂着 composer 的页面。可拖到任意位置，位置记在 `localStorage`。 |
+| `conversation.input.left` | 同一个控件也放在输入框左侧工具行里，`+` 旁边 |
 
 | 手势 | 截取目标 |
 | --- | --- |
 | 点击 | DeepSeek Harness 窗口（标题含 `DeepSeek Harness` 的最大可见窗口；找不到就用前台窗口） |
 | Shift+点击 | 整个桌面（所有显示器） |
 | Alt+点击 | 当前前台窗口 |
-| `Ctrl+Shift+S` | 等同点击，作用于当前拥有键盘焦点的那个 composer |
+| `Ctrl+Shift+S` | 等同点击，在页面任意位置都可用 |
 
-每种手势的落点都一样：PNG 成为输入框里的草稿附件，下一条消息直接带着图。点击不会抢键盘——`mousedown` 已 preventDefault，光标留在原处。
+图片落到哪里取决于当前屏幕：挂着 composer 时进它的草稿（成为附件，下一条消息直接带着图）；页面上没有 composer 时进系统剪贴板，等你回到对话页粘贴。点击不会抢键盘——`mousedown` 已 preventDefault，光标留在原处。
 
 控件就地汇报结果：宿主截图时转圈，之后几秒显示「已放入输入框」与截取尺寸，失败时显示宿主返回的原因；悬停提示里带着完整手势列表与最近一次结果。
 
-## 图片怎么进到输入框
+## 图片落到哪里
 
-Client 半边走的是 composer 自己粘贴/拖拽时的同一条路：
+挂着 composer 时，Client 半边走的是 composer 自己粘贴/拖拽时的同一条路：
 
 1. `POST /api/quick-screenshot` 返回 PNG 字节（外加一小段元数据响应头）。
 2. `ctx.conversation.createDrafts(sessionId, [file])` 登记这个浏览器文件并返回草稿 id。
 3. 标准 prop `inputActions` 用 `addAttachments(ids)` 把这些 id 收进当前草稿——附件栏随即出现缩略图，发送时图片随消息一起序列化。
+
+页面上**没有** composer 时（插件页、轨迹、设置…），同一张截图会写进系统剪贴板，
+结果气泡会说明这一点——等你到了对话页直接粘贴即可。如果剪贴板拒绝写入，
+气泡会改成给出落盘的 PNG 路径。
 
 这些服务不可用时，客户端退回在 `[data-composer-input="true"]` 上派发一个携带该文件的合成 `paste` 事件——和手动粘贴走的是同一条路。
 
@@ -47,7 +52,7 @@ Client 半边走的是 composer 自己粘贴/拖拽时的同一条路：
 | `titlePattern` | `window` 模式匹配的窗口标题，默认 `DeepSeek Harness` |
 | `maxDimension` | 可选的最长边上限；`0` 保持原始截取尺寸 |
 
-响应是 `image/png`，带 `Cache-Control: no-store`，并用一个 `X-Screenshot` 头携带 percent-encoded JSON 元数据（`mode`、`method`、`window`、`width`、`height`、`bytes`）。失败时返回 JSON，带稳定的 `code`（`CAPTURE_UNSUPPORTED`、`CAPTURE_TIMEOUT`、`CAPTURE_FAILED`、`METHOD_NOT_ALLOWED`）与面向使用者的说明。两种方法都通过 `ctx.connection.fetch` 注册，因此共享的 `/api` 桥会先做 Host/Origin 校验与浏览器 cookie 鉴权。
+响应是 `image/png`，带 `Cache-Control: no-store`，并用一个 `X-Screenshot` 头携带 percent-encoded JSON 元数据（`mode`、`method`、`window`、`width`、`height`、`bytes`、`path`）。失败时返回 JSON，带稳定的 `code`（`CAPTURE_UNSUPPORTED`、`CAPTURE_TIMEOUT`、`CAPTURE_FAILED`、`METHOD_NOT_ALLOWED`）与面向使用者的说明。两种方法都通过 `ctx.connection.fetch` 注册，因此共享的 `/api` 桥会先做 Host/Origin 校验与浏览器 cookie 鉴权。
 
 ## 截图后端
 
@@ -90,7 +95,11 @@ node scripts/client-smoke.mjs    # 客户端 bundle、控件与附件流
 
 `.github/workflows/test.yml` 在每次 push 与 PR 上带该标志跑两套测试，因此没有桌面的机器上仓库也能保持绿色。
 
-`scripts/client-smoke.mjs` 用桩模块加载器、会执行 effect 的小型 React 桩与假的 composer 服务来评估 bundle：断言 `apply` 注册了什么，然后把 `captureInto` 依次跑过准入、输入框锁定、宿主拒绝、空图像与粘贴兜底，最后挂载控件并触发 `Ctrl+Shift+S` 组合键。
+`scripts/client-smoke.mjs` 用桩模块加载器、会执行 effect 的小型 React 桩与假的 composer 服务来评估 bundle：
+断言 `apply` 注册了两个位置，然后把共用的投递路径依次跑过准入、输入框锁定、宿主拒绝、空图像、
+粘贴兜底，以及「没有 composer 时进剪贴板」与「剪贴板被拒」。最后挂载两个控件：
+输入框按钮点击即截图且不丢焦点；悬浮控件拖过阈值会记住位置、并抑制拖拽结束那一下点击；
+`Ctrl+Shift+S` 组合键也由它响应。
 
 ## 已知限制
 

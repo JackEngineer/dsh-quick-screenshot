@@ -1,6 +1,6 @@
 ## What this adds
 
-`dsh-quick-screenshot` — one camera control in the composer tool row that captures the **DeepSeek Harness window** (Shift+click: the whole desktop, Alt+click: the active window, or `Ctrl+Shift+S`) with the host's own capture tooling and drops the PNG **straight into the composer draft as an attachment**.
+`dsh-quick-screenshot` — a camera control that **floats over every DSH page** (plus the same control in the composer tool row). One click captures the **DeepSeek Harness window** (Shift+click: the whole desktop, Alt+click: the active window, or `Ctrl+Shift+S` from anywhere) with the host's own capture tooling, and the PNG lands where it is useful: **straight into the composer draft as an attachment**, or on the **clipboard** when no composer is mounted. The floating control is draggable and remembers its anchor.
 
 - Repository: <https://github.com/JackEngineer/dsh-quick-screenshot>
 - Category: `ui`
@@ -8,7 +8,7 @@
 
 ## Why it is not a duplicate
 
-`deepseekbluefish/dsh-screenshot-plugin` is a WeChat-style **drag-a-region** picker (Windows only) that writes a `[Shot N HH:mm]` **text marker** into the composer. This plugin instead captures the whole window with `PrintWindow` (an occluded window still captures), attaches the image itself through the composer's own `createDrafts` + `addAttachments` path (the same path paste and drop use), and ships macOS (`screencapture`) and Linux backends as well.
+`deepseekbluefish/dsh-screenshot-plugin` is a WeChat-style **drag-a-region** picker (Windows only) that writes a `[Shot N HH:mm]` **text marker** into the composer. This plugin instead: floats over the whole window so it also works on pages with no composer; captures the whole window with `PrintWindow` (an occluded window still captures); hands the image to the composer through its own `createDrafts` + `addAttachments` path (the same path paste and drop use) rather than leaving a marker; falls back to the clipboard off-conversation; and ships macOS (`screencapture`) and Linux backends as well.
 
 ## Requirements checked
 
